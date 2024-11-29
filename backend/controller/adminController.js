@@ -60,7 +60,7 @@ const adminLogin = async (req, res) => {
     const isAdmin = await AdminData.findOne({ email: email.toLowerCase() });
     // console.log(isAdmin);
     if((email == "") || (password == "")){
-      res.status(200).send("All field are required*");
+      res.status(200).send("All field are required");
     }
 
    else if (isAdmin) {
@@ -79,7 +79,7 @@ const adminLogin = async (req, res) => {
 
           await res.status(200).send(jwttoken);
       } else {
-        res.status(200).send("invalid credetial: password wrong");
+        res.status(200).send("invalid credetial:password wrong");
       }
     } else {
       res.status(200).send("Invalid user:Email not found");

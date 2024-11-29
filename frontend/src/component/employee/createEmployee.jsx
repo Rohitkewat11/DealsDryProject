@@ -2,11 +2,17 @@ import { useFormik } from "formik";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+
 
 
 export function CreateEmployee() {
   const [errorMsg, setErrorMsg] = useState();
   let nevigate = useNavigate();
+  const validation = Yup.object({
+    email: Yup.string().email(),
+    mobile:Yup.number(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -15,15 +21,17 @@ export function CreateEmployee() {
       mobile: "",
       desigination:"",
       gender:"",
-      course:"",
+      course:[],
       profileImg: "",
     },
-
+    validationSchema:validation,
     onSubmit:async (values) => {
+      console.log(values);
+      
       const formData = new FormData();
 
-      for(let value in values){
-        formData.append(value,values[value]);
+      for (let value in values) {
+        formData.append(value, values[value]);
       }
       console.log(formData);
 
@@ -31,15 +39,16 @@ export function CreateEmployee() {
       .post("http://127.0.0.1:2200/addEmployee",formData)
         .then((res) => {
           console.log(res.data);
-          // if (res.data ==="New Employee Added Succeessfully") {
-          //   setErrorMsg("");
-          //   // nevigate("/adminDashboard");
-          // } else {
-          //   setErrorMsg(res.data);
-          // }
+          if (res.data ==="New Employee Added Succeessfully") {
+            setErrorMsg("");
+            nevigate("/adminDashboard");
+          } else {
+            setErrorMsg(res.data);
+          }
         })
         .catch((error) => {
           console.log(error); 
+          alert("error");
         });
     }
   });
@@ -78,6 +87,7 @@ export function CreateEmployee() {
                 name="email"
                 placeholder="Email"
               />
+              <p className="text-red-500">{formik.errors.email}</p>
               <label className="form-label fw-semibold" htmlFor="">
                 Mobile
               </label>
@@ -88,6 +98,7 @@ export function CreateEmployee() {
                 name="mobile"
                 placeholder="Mobile"
               />
+              <p className="text-red-500">{formik.errors.mobile}</p>
               <label className="form-label fw-semibold" htmlFor="">
                 Desigination
               </label>
@@ -155,6 +166,7 @@ export function CreateEmployee() {
                 className="form-control"
                 type="file"
                 name="profileImg"
+                accept=".png,.jpg"
               />
               <div className="text-danger">{errorMsg}</div>
               <button

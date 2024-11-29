@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 export function AdminDashboard() {
   const [data, setData] = useState([]);
   const [adminInfo, setAdminInfo] = useState({});
@@ -41,6 +41,12 @@ export function AdminDashboard() {
     var flag = window.confirm("delete?\n are your sure.");
     if (flag) {
       await axios.post("http://127.0.0.1:2200/deleteEmployeeData", value);
+      await axios.get("http://127.0.0.1:2200/employee")
+      .then((res)=>{
+        setData(res.data.Emp_data);
+      }).catch((err)=>{
+        console.log(err);
+      })
     }
   }
 
@@ -139,6 +145,7 @@ export function AdminDashboard() {
             <tr className="text-center">
               <th>Emp_id</th>
               <th>Name</th>
+              <th>Profile</th>
               <th>Email</th>
               <th>Mobile</th>
               <th>Desigination</th>
@@ -152,6 +159,9 @@ export function AdminDashboard() {
               <tr className="text-center" key={val.emp_id}>
                 <td>{val.emp_id}</td>
                 <td>{val.name}</td>
+                <td>
+                  <img src={`http://127.0.0.1:2200/profileImages/${val.profileImg}`} alt="Profile" height={30} width={30} />
+                </td>
                 <td>{val.email}</td>
                 <td>{val.mobile}</td>
                 <td>{val.desigination}</td>

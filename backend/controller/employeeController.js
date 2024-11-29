@@ -1,5 +1,6 @@
 const EmployeeData = require("../model/employeeSchema");
 
+
 //  API for fetching all employee data==================>
 const getAllEmployee = async(req,res)=>{
 
@@ -17,13 +18,13 @@ const getAllEmployee = async(req,res)=>{
 //  API for creating new employee data=====================>
 const addEmployee =async (req, res) => {
     const {name, email, mobile, desigination, gender,course } = req.body;
-    // console.log(req.body);
+    const courseArray = typeof course === "string" ? course.split(",") : course;
     
     try {
       // validating employee already exist or not//
       const employeeEmailExist = await EmployeeData.findOne({ email: email });
       
-      if(name==""||email==""||mobile==""||desigination==""||gender==""||course==""||prfileImg==""){
+      if(name==""||email==""||mobile==""||desigination==""||gender==""||course==""||req.file.filename==""){
         return res.status(200).send("All fields are required");
       }
       else if (employeeEmailExist) {
@@ -54,24 +55,36 @@ const addEmployee =async (req, res) => {
             mobile:mobile,
             desigination:desigination,
             gender:gender,
-            course:course,
+            course:courseArray,
             enroll:`${dd}-${month[mm]}-${yyyy}`,
             profileImg: req.file.filename,
         };
   
-        console.log(Emp_Data);
       //if user not exist just create it new user//
-      // await EmployeeData.create(Emp_Data);
-      // res.status(200).send("New Employee Added Succeessfully");
+      await EmployeeData.create(Emp_Data);
+      res.status(200).send("New Employee Added Succeessfully");
       }
     } catch (error) {
       res.status(500).send(error);
     }
   }
 
+// API for find EMP based on EMp_id=========================>
+  const findEmpID = async(req,res)=>{
+    const EmpID = req.query.empID;
+
+    try {
+      const emp_data =await EmployeeData.findOne({emp_id:EmpID});
+      res.status(200).send(emp_data)
+    } catch (error) {
+      res.status(404).send(error);
+    }
+  }
+
 //   API for find specific Employee Data====================>
   const findEmployee = async (req,res)=>{
     const Emp_details = req.query.Emp_details;
+    
     try {
       const employeeExist = await EmployeeData.find({$or:[{email:Emp_details},{name:Emp_details},{emp_id:Emp_details}]});
       if (employeeExist) {
@@ -86,25 +99,25 @@ const addEmployee =async (req, res) => {
 
 //   API for updating employee data===================>
   const updateEmployeeData = async (req,res)=>{
+    
     const {emp_id, name, email, mobile, desigination, gender,course } = req.body;
     
+    
+    const updatedEmpData = {
+      emp_id:emp_id,
+      name:name,
+      email:email,
+      mobile:mobile,
+      desigination:desigination,
+      gender:gender,
+      course:course,
+      profileImg: req.file.filename,
+    }
+    
+    console.log(updatedEmpData);
     try {
-        const updatedEmpData = {
-            emp_id:emp_id,
-            name:name,
-            email:email,
-            mobile:mobile,
-            desigination:desigination,
-            gender:gender,
-            course:course
-        }
-      const employeeEmailExist = await EmployeeData.findOne({ email: email });
-        if (employeeEmailExist) {
-            await EmployeeData.findOneAndUpdate({email:email},{$set:updatedEmpData});
+        await EmployeeData.findOneAndUpdate({ emp_id: emp_id }, { $set: updatedEmpData });
             res.status(200).send("Employee data updated successfully");
-        }else{
-            res.status(404).send("Data not found: Employee not exist");
-        }
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -127,4 +140,4 @@ const addEmployee =async (req, res) => {
     }
   };
 
-module.exports = {getAllEmployee,addEmployee,findEmployee,updateEmployeeData,deleteEmployeeData};
+module.exports = {getAllEmployee,addEmployee,findEmpID,findEmployee,updateEmployeeData,deleteEmployeeData};

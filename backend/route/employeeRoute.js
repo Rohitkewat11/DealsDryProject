@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path   = require("path");
 
-const {getAllEmployee, addEmployee, findEmployee,updateEmployeeData,deleteEmployeeData} = require("../controller/employeeController");
+const {getAllEmployee, addEmployee,findEmpID, findEmployee,updateEmployeeData,deleteEmployeeData} = require("../controller/employeeController");
 
 
 // function for uploading profile Images=========>
@@ -27,8 +27,9 @@ const storage = multer.diskStorage({
 //API route for Employee //
 router.get("/employee",getAllEmployee);
 router.post("/addEmployee",upload.single('profileImg'),addEmployee);
+router.post("/findEmpID",findEmpID);
 router.get("/findEmployee",findEmployee);
-router.put("/updateEmployeeData",updateEmployeeData);
+router.put("/updateEmployeeData",upload.single('profileImg'),updateEmployeeData);
 router.post("/deleteEmployeeData",deleteEmployeeData);
 
 
